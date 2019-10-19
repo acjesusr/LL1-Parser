@@ -5,6 +5,9 @@
  */
 package camargo.marquez;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
  *
  * @author JesusCamargo
@@ -29,7 +32,7 @@ public class View extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        grammarFileChooser = new javax.swing.JFileChooser();
+        impFileChooser = new javax.swing.JFileChooser();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
@@ -141,7 +144,13 @@ public class View extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(null,"txt","csv","");
+        impFileChooser.setFileFilter(filter);
+        int option = impFileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            cfg.loadFromFile(impFileChooser.getSelectedFile());
+        }
+        System.out.println("HashMap: " + cfg.getNonTerminals());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -170,10 +179,12 @@ public class View extends javax.swing.JFrame {
             new View().setVisible(true);
         });
     }
+    
+    ContextFreeGrammar cfg = new ContextFreeGrammar();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField fileTextField;
-    private javax.swing.JFileChooser grammarFileChooser;
+    private javax.swing.JFileChooser impFileChooser;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
