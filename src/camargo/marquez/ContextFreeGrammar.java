@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 public class ContextFreeGrammar {
 
     private HashMap<Character,ArrayList<String>> nonTerminals;
+    private char s;
     
     public ContextFreeGrammar(){
         nonTerminals = new HashMap<>();
@@ -35,7 +36,11 @@ public class ContextFreeGrammar {
                 }else{
                     ArrayList<String> productions = new ArrayList<>();
                     productions.add(temp.substring(3));
+                    if (nonTerminals.isEmpty()) {
+                        s = temp.charAt(0);
+                    }
                     nonTerminals.put(temp.charAt(0), productions);
+                    
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -56,4 +61,20 @@ public class ContextFreeGrammar {
     public void setNonTerminals(HashMap<Character,ArrayList<String>> nonTerminals) {
         this.nonTerminals = nonTerminals;
     }
+
+    /**
+     * @return the s
+     */
+    public char getS() {
+        return s;
+    }
+
+    /**
+     * @param s the s to set
+     */
+    public void setS(char s) {
+        this.s = s;
+    }
+    
+    
 }

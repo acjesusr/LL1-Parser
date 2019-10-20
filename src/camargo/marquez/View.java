@@ -144,13 +144,14 @@ public class View extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(null,"txt","csv","");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("","txt","csv","text");
         impFileChooser.setFileFilter(filter);
         int option = impFileChooser.showOpenDialog(this);
         if (option == JFileChooser.APPROVE_OPTION) {
             cfg.loadFromFile(impFileChooser.getSelectedFile());
         }
         System.out.println("HashMap: " + cfg.getNonTerminals());
+        System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
