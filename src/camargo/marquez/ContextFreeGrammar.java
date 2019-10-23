@@ -47,9 +47,12 @@ public class ContextFreeGrammar {
     private void validate(){
        nonTerminals.forEach((key,prods)->{
            ArrayList<String> temp = checkRecursion(key, prods);
+           System.out.println("Before factorization: " + prods);
            temp = checkFactorization(key, prods);
-           System.out.println("factorization: " + temp);
-           nonTerminals.put(key + "'", temp);
+           System.out.println("After factorization: " + prods + "->" + temp);
+           /*if (temp != null) {
+              nonTerminals.put(key + "'", temp); 
+           }*/
        });
     }
     
@@ -70,6 +73,7 @@ public class ContextFreeGrammar {
                     }
                 }
                 if (!factor.isEmpty()) {
+                    //System.out.println("Factor: " + factor);
                     break;
                 }
                 i++;
@@ -80,8 +84,9 @@ public class ContextFreeGrammar {
                 while(i<prods.size()){
                     String prod = prods.get(i);
                     if (prod.startsWith(factor)) {
-                        tProds.add(prod.substring(factor.length()-1, prod.length()));
-                        System.out.println("Factoring: " + prod.substring(factor.length()-1, prod.length()));
+                        String gamma = prod.substring(factor.length(), prod.length());
+                        tProds.add(gamma.isEmpty() ? "&" : gamma);
+                        System.out.println("Factoring: " + (gamma.isEmpty() ? "&" : gamma));
                         prods.remove(i);
                     }else{
                         i++;
