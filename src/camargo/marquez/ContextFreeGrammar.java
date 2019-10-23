@@ -8,7 +8,7 @@ package camargo.marquez;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,11 +19,10 @@ import java.util.logging.Logger;
  */
 public class ContextFreeGrammar {
 
-    private HashMap<Character,ArrayList<String>> nonTerminals;
-    private char s;
+    private LinkedHashMap<String,ArrayList<String>> nonTerminals;
     
     public ContextFreeGrammar(){
-        nonTerminals = new HashMap<>();
+        nonTerminals = new LinkedHashMap<>();
     }
     
     public void loadFromFile(File file){
@@ -31,50 +30,99 @@ public class ContextFreeGrammar {
             Scanner fScan = new Scanner(file);
             while(fScan.hasNext()){
                 String temp = fScan.nextLine();
-                if (nonTerminals.containsKey(temp.charAt(0))) {
-                    nonTerminals.get(temp.charAt(0)).add(temp.substring(3));
+                if (nonTerminals.containsKey(temp.charAt(0)+"")) {
+                    nonTerminals.get(temp.charAt(0)+"").add(temp.substring(3));
                 }else{
                     ArrayList<String> productions = new ArrayList<>();
                     productions.add(temp.substring(3));
-                    if (nonTerminals.isEmpty()) {
-                        s = temp.charAt(0);
-                    }
-                    nonTerminals.put(temp.charAt(0), productions);
-                    
+                    nonTerminals.put(temp.charAt(0)+"", productions);
                 }
             }
+            this.validate();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, "File not found", ex);
         }
+    }
+    
+    private void validate(){
+       nonTerminals.forEach((key,prods)->{
+           ArrayList<String> temp = checkRecursion(key, prods);
+           temp = checkFactorization(key, prods);
+           System.out.println("factorization: " + temp);
+           nonTerminals.put(key + "'", temp);
+       });
+    }
+    
+    private ArrayList<String> checkFactorization(String header,ArrayList<String> prods){
+        if (prods.size()>1) {
+            String factor = "";
+            int i = 0;
+            while(i < prods.size()) {
+                for (int j = i; j < prods.size(); j++) {
+                    String temp;
+                    if (factor.isEmpty()) {
+                        temp = commonString(prods.get(i),prods.get(j));
+                    }else{
+                        temp = commonString(factor,prods.get(j));
+                    }
+                    if (!temp.isEmpty()) {
+                        factor = temp;
+                    }
+                }
+                if (!factor.isEmpty()) {
+                    break;
+                }
+                i++;
+            }
+            if (!factor.isEmpty()) {
+                ArrayList<String> tProds = new ArrayList<>();
+                i=0;
+                while(i<prods.size()){
+                    String prod = prods.get(i);
+                    if (prod.startsWith(factor)) {
+                        tProds.add(prod.substring(factor.length()-1, prod.length()));
+                        System.out.println("Factoring: " + prod.substring(factor.length()-1, prod.length()));
+                        prods.remove(i);
+                    }else{
+                        i++;
+                    }
+                }
+                prods.add(factor + header + "'");
+                return tProds;
+            }
+        }
+        return null;
+    }
+    
+    private String commonString(String str1, String str2){
+        char[] chars1 = str1.toCharArray();
+            char[] chars2 = str2.toCharArray();
+            int i = 0;
+            while(i < chars1.length && i<chars2.length){
+                if (chars1[i] != chars2[i]) {
+                    break;
+                }
+                i++;
+            }
+        return str1.substring(0, i);
+    }
+    
+    private ArrayList<String> checkRecursion(String key, ArrayList<String> prods){
+        return null;
     }
     
     /**
      * @return the nonTerminals
      */
-    public HashMap<Character,ArrayList<String>> getNonTerminals() {
+    public LinkedHashMap<String,ArrayList<String>> getNonTerminals() {
         return nonTerminals;
     }
 
     /**
      * @param nonTerminals the nonTerminals to set
      */
-    public void setNonTerminals(HashMap<Character,ArrayList<String>> nonTerminals) {
+    public void setNonTerminals(LinkedHashMap<String,ArrayList<String>> nonTerminals) {
         this.nonTerminals = nonTerminals;
     }
-
-    /**
-     * @return the s
-     */
-    public char getS() {
-        return s;
-    }
-
-    /**
-     * @param s the s to set
-     */
-    public void setS(char s) {
-        this.s = s;
-    }
-    
     
 }

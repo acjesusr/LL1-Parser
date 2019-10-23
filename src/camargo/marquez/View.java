@@ -5,6 +5,7 @@
  */
 package camargo.marquez;
 
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -151,7 +152,7 @@ public class View extends javax.swing.JFrame {
             cfg.loadFromFile(impFileChooser.getSelectedFile());
         }
         System.out.println("HashMap: " + cfg.getNonTerminals());
-        System.out.println(cfg.getS());
+        //System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
