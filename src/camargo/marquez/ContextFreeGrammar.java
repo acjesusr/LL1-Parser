@@ -116,24 +116,17 @@ public class ContextFreeGrammar {
     private ArrayList<String> checkRecursion(String header, ArrayList<String> prods){
         ArrayList<String> alpha = new ArrayList<>();
         ArrayList<String> removing= new ArrayList<>();
-        /*int i = 0;
-        while(i<prods.size()){
-            String temp = commonString(header,prods.get(i));
-            if (!temp.isEmpty()) {
-                alpha.add(prods.get(i).substring(1));
-                removing.add(prods.get(i));
-            }
-        }*/
         prods.forEach((prod) -> {
-            String temp = commonString(header,prod);
-            if (!temp.isEmpty()) {
-                alpha.add(prod.substring(1));
+            if (prod.startsWith(header)) {
+                alpha.add(prod.substring(1)+header+"'");
                 removing.add(prod);
             }
         });
         if (!alpha.isEmpty()) {
             prods.removeAll(removing);
             prods.forEach((prod)->prod.concat(header+"'"));
+            prods.replaceAll((String t) -> t+header+"'");
+            alpha.add("&");
             return alpha;
         }
         //prods.
