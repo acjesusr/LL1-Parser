@@ -46,9 +46,10 @@ public class ContextFreeGrammar {
     
     private void validate(){
        nonTerminals.forEach((key,prods)->{
+           System.out.println("Before: " + prods);
            ArrayList<String> temp = checkRecursion(key, prods);
-           System.out.println("Before factorization: " + prods);
-           temp = checkFactorization(key, prods);
+           System.out.println("After recursion: " + prods + "->" + temp);
+          /*temp = checkFactorization(key, prods);
            System.out.println("After factorization: " + prods + "->" + temp);
            /*if (temp != null) {
               nonTerminals.put(key + "'", temp); 
@@ -112,7 +113,30 @@ public class ContextFreeGrammar {
         return str1.substring(0, i);
     }
     
-    private ArrayList<String> checkRecursion(String key, ArrayList<String> prods){
+    private ArrayList<String> checkRecursion(String header, ArrayList<String> prods){
+        ArrayList<String> alpha = new ArrayList<>();
+        ArrayList<String> removing= new ArrayList<>();
+        /*int i = 0;
+        while(i<prods.size()){
+            String temp = commonString(header,prods.get(i));
+            if (!temp.isEmpty()) {
+                alpha.add(prods.get(i).substring(1));
+                removing.add(prods.get(i));
+            }
+        }*/
+        prods.forEach((prod) -> {
+            String temp = commonString(header,prod);
+            if (!temp.isEmpty()) {
+                alpha.add(prod.substring(1));
+                removing.add(prod);
+            }
+        });
+        if (!alpha.isEmpty()) {
+            prods.removeAll(removing);
+            prods.forEach((prod)->prod.concat(header+"'"));
+            return alpha;
+        }
+        //prods.
         return null;
     }
     
