@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 public class ContextFreeGrammar {
 
     private LinkedHashMap<String,ArrayList<String>> nonTerminals;
+    private ArrayList<String> alphabet = new ArrayList<>();
     
     public ContextFreeGrammar(){
         nonTerminals = new LinkedHashMap<>();
@@ -149,6 +150,34 @@ public class ContextFreeGrammar {
         //prods.
         return null;
     }
+    
+    //return a hashMap key: nonTerminal, value: First arrayList of that noterminal
+   private LinkedHashMap<String,ArrayList<String>> first(){
+       LinkedHashMap<String,ArrayList<String>> firstHashMap = new LinkedHashMap<>();
+       for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
+        ArrayList<String> firstArray = new ArrayList<>();
+         int i = 0;
+         firstArray = searchTerminal(nonTerminals.get(key));
+         firstHashMap.put(key,firstArray);
+       }
+       return firstHashMap;
+   }
+   
+   private ArrayList<String> searchTerminal(ArrayList<String> auxArray){
+        int i = 0;
+        ArrayList<String> firstArray = new ArrayList<>();
+        int j = 0;
+        if(j<auxArray.size()){
+            if(!nonTerminals.containsKey(auxArray.get(j).charAt(i))){
+                firstArray.add(auxArray.get(j).charAt(i)+"");
+                j=auxArray.size();
+            }else{
+                searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)));
+            }
+            j++;
+        }
+       return firstArray;
+   }
     
     /**
      * @return the nonTerminals
