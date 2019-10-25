@@ -45,16 +45,33 @@ public class ContextFreeGrammar {
     }
     
     private void validate(){
-       nonTerminals.forEach((key,prods)->{
+       /*nonTerminals.forEach((key,prods)->{
+           if (!key.endsWith("'")) {
+                System.out.println("Before: " + prods);
+                ArrayList<String> temp = checkRecursion(key, prods);
+                System.out.println("After recursion: " + prods + "->" + temp);
+                if (temp == null) {
+                    temp = checkFactorization(key, prods);
+                    System.out.println("After factorization: " + prods + "->" + temp);
+               }
+                if (temp != null) {
+                   nonTerminals.put(key + "'", temp); 
+                }
+           }
+       });*/
+        for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
+           ArrayList<String> prods  = nonTerminals.get(key);
            System.out.println("Before: " + prods);
            ArrayList<String> temp = checkRecursion(key, prods);
            System.out.println("After recursion: " + prods + "->" + temp);
-          /*temp = checkFactorization(key, prods);
-           System.out.println("After factorization: " + prods + "->" + temp);
-           /*if (temp != null) {
-              nonTerminals.put(key + "'", temp); 
-           }*/
-       });
+           if (temp == null) {
+               temp = checkFactorization(key, prods);
+               System.out.println("After factorization: " + prods + "->" + temp);
+           }
+            if (temp != null) {
+                nonTerminals.put(key + "'", temp);
+            } 
+        }
     }
     
     private ArrayList<String> checkFactorization(String header,ArrayList<String> prods){
