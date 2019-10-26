@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,9 +22,13 @@ import java.util.logging.Logger;
 public class ContextFreeGrammar {
 
     private LinkedHashMap<String,ArrayList<String>> nonTerminals;
+    private LinkedHashMap<String,LinkedHashSet<String>> firstMap;
+    private LinkedHashMap<String,LinkedHashSet<String>> followMap;
     
     public ContextFreeGrammar(){
         nonTerminals = new LinkedHashMap<>();
+        firstMap = new LinkedHashMap<>();
+        followMap = new LinkedHashMap<>();
     }
     
     public void loadFromFile(File file){
@@ -39,7 +45,8 @@ public class ContextFreeGrammar {
                 }
             }
             this.validate();
-            System.out.println("prim"+ this.first());
+            this.first();
+            System.out.println("first: "+ firstMap);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, "File not found", ex);
         }
@@ -151,7 +158,7 @@ public class ContextFreeGrammar {
         return null;
     }
     
-    private LinkedHashMap<String,ArrayList<String>> first(){
+    /*private LinkedHashMap<String,ArrayList<String>> first(){
        LinkedHashMap<String,ArrayList<String>> firstHashMap = new LinkedHashMap<>();
        for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
         ArrayList<String> firstArray = new ArrayList<>();
@@ -166,16 +173,45 @@ public class ContextFreeGrammar {
         ArrayList<String> firstArray = new ArrayList<>();
         j = 0;
         if(j<auxArray.size()){
-            if(!nonTerminals.containsKey(auxArray.get(j).charAt(i)+"")){
-                firstArray.add(auxArray.get(j).charAt(i)+"");
+            String temp = auxArray.get(j).length() > 1 && auxArray.get(j).charAt(i+1) == (char)39 ?
+                    auxArray.get(j).substring(0, i+2) : auxArray.get(j).charAt(i)+"";
+            //System.out.println("temp: " + temp);
+            if(!nonTerminals.containsKey(temp)){
+                firstArray.add(temp);
                 //searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)+""),j++);
             }else{
-                System.out.println("switch to:" +auxArray.get(j).charAt(i)+"");
-                firstArray.addAll(searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)+""),j++));
+                System.out.println("switch to: " +temp);
+                firstArray.addAll(searchTerminal(nonTerminals.get(temp),j));
             }
         }
        return firstArray;
-   }
+   }*/
+    private void first(){
+        Stack<String[]> update = new Stack<>();
+        nonTerminals.forEach((header, prods) -> {
+            LinkedHashSet<String> first = new LinkedHashSet<>();
+            prods.forEach((prod) -> {
+                String start = prod.charAt(0)+"";
+                if (start.toLowerCase().equals(start)) {
+                    first.add(start);
+                }else{
+                    if (prod.length() > 1 && prod.charAt(1) == (char)39) {
+                        start+="'";
+                    }
+                    if (firstMap.containsKey(start)) {
+                        first.addAll(firstMap.get(start));
+                    }else{
+                        update.add(new String[]{header,start});//header contains start
+                    }
+                }
+            });
+            firstMap.put(header, first);
+        });
+        while(!update.isEmpty()){
+            String[] reference = update.pop();
+            firstMap.get(reference[0]).addAll(firstMap.get(reference[1]));
+        }
+    }
     
     /**
      * @return the nonTerminals
@@ -189,6 +225,20 @@ public class ContextFreeGrammar {
      */
     public void setNonTerminals(LinkedHashMap<String,ArrayList<String>> nonTerminals) {
         this.nonTerminals = nonTerminals;
+    }
+
+    /**
+     * @return the firstMap
+     */
+    public LinkedHashMap<String,LinkedHashSet<String>> getFirstMap() {
+        return firstMap;
+    }
+
+    /**
+     * @return the followMap
+     */
+    public LinkedHashMap<String,LinkedHashSet<String>> getFollowMap() {
+        return followMap;
     }
     
 }

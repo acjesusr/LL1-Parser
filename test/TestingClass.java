@@ -1,6 +1,5 @@
 
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.HashMap;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,9 +13,12 @@ import java.util.Scanner;
  */
 public class TestingClass {
     public static void main(String[] args) {
-        String t1 = "E,S",t2 = "abb";
+        /*String t1 = "E,S",t2 = "abb";
         System.out.println(commonString("E",t1));
-        System.out.println(commonString("E",t2));
+        System.out.println(commonString("E",t2));*/
+        HashMap<String,String> a = new HashMap();
+        a.put("monda", "verga");
+        System.out.println(a.get("monda"));
     }
     static String commonString(String str1, String str2){
         char[] chars1 = str1.toCharArray();
