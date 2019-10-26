@@ -39,6 +39,7 @@ public class ContextFreeGrammar {
                 }
             }
             this.validate();
+            System.out.println("prim"+ this.first());
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, "File not found", ex);
         }
@@ -154,25 +155,24 @@ public class ContextFreeGrammar {
        LinkedHashMap<String,ArrayList<String>> firstHashMap = new LinkedHashMap<>();
        for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
         ArrayList<String> firstArray = new ArrayList<>();
-         int i = 0;
-         firstArray = searchTerminal(nonTerminals.get(key));
+         firstArray = searchTerminal(nonTerminals.get(key),0);
          firstHashMap.put(key,firstArray);
        }
        return firstHashMap;
    }
    
-   private ArrayList<String> searchTerminal(ArrayList<String> auxArray){
+   private ArrayList<String> searchTerminal(ArrayList<String> auxArray, int j){
         int i = 0;
         ArrayList<String> firstArray = new ArrayList<>();
-        int j = 0;
+        j = 0;
         if(j<auxArray.size()){
-            if(!nonTerminals.containsKey(auxArray.get(j).charAt(i))){
+            if(!nonTerminals.containsKey(auxArray.get(j).charAt(i)+"")){
                 firstArray.add(auxArray.get(j).charAt(i)+"");
-                j=auxArray.size();
+                //searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)+""),j++);
             }else{
-                searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)));
+                System.out.println("switch to:" +auxArray.get(j).charAt(i)+"");
+                firstArray.addAll(searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)+""),j++));
             }
-            j++;
         }
        return firstArray;
    }
