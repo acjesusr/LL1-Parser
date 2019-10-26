@@ -53,20 +53,6 @@ public class ContextFreeGrammar {
     }
     
     private void validate(){
-       /*nonTerminals.forEach((key,prods)->{
-           if (!key.endsWith("'")) {
-                System.out.println("Before: " + prods);
-                ArrayList<String> temp = checkRecursion(key, prods);
-                System.out.println("After recursion: " + prods + "->" + temp);
-                if (temp == null) {
-                    temp = checkFactorization(key, prods);
-                    System.out.println("After factorization: " + prods + "->" + temp);
-               }
-                if (temp != null) {
-                   nonTerminals.put(key + "'", temp); 
-                }
-           }
-       });*/
         for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
            ArrayList<String> prods  = nonTerminals.get(key);
            System.out.println("Before: " + prods);
@@ -87,7 +73,7 @@ public class ContextFreeGrammar {
             String factor = "";
             int i = 0;
             while(i < prods.size()) {
-                for (int j = i; j < prods.size(); j++) {
+                for (int j = i+1; j < prods.size(); j++) {
                     String temp;
                     if (factor.isEmpty()) {
                         temp = commonString(prods.get(i),prods.get(j));
@@ -110,9 +96,9 @@ public class ContextFreeGrammar {
                 while(i<prods.size()){
                     String prod = prods.get(i);
                     if (prod.startsWith(factor)) {
-                        String gamma = prod.substring(factor.length(), prod.length());
-                        tProds.add(gamma.isEmpty() ? "&" : gamma);
-                        System.out.println("Factoring: " + (gamma.isEmpty() ? "&" : gamma));
+                        String beta = prod.substring(factor.length(), prod.length());
+                        tProds.add(beta.isEmpty() ? "&" : beta);
+                        System.out.println("Factoring: " + (beta.isEmpty() ? "&" : beta));
                         prods.remove(i);
                     }else{
                         i++;
