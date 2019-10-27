@@ -44,15 +44,13 @@ public class ContextFreeGrammar {
                     nonTerminals.put(temp.charAt(0)+"", productions);
                 }
             }
-            this.validate();
-            System.out.println("first: "+ firstMap);
-            System.out.println("follow: " + followMap);
+            //this.validate();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, "File not found", ex);
         }
     }
     
-    private void validate(){
+    public void validate(){
         for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
            ArrayList<String> prods  = nonTerminals.get(key);
            System.out.println("Before: " + prods);
@@ -226,6 +224,16 @@ public class ContextFreeGrammar {
             String[] reference = update.pop();
             followMap.get(reference[0]).addAll(followMap.get(reference[1]));
         }
+    }
+    
+    @Override
+    public String toString(){
+        String res = "";
+        res = nonTerminals.keySet().stream().map((header) -> 
+                nonTerminals.get(header).stream().map((prod) ->
+                        header + " -> " + prod + "\n")
+                        .reduce("", String::concat)).reduce(res, String::concat);
+        return res;
     }
     
     /**

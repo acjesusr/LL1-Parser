@@ -18,6 +18,7 @@ public class TestingClass {
         System.out.println(commonString("E",t2));*/
         HashMap<String,String> a = new HashMap();
         a.put("monda", "verga");
+        System.out.println("a\nb");
         System.out.println(a.get("monda"));
     }
     static String commonString(String str1, String str2){

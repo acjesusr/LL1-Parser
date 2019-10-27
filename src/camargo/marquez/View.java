@@ -5,7 +5,7 @@
  */
 package camargo.marquez;
 
-import java.util.ArrayList;
+import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -20,8 +20,8 @@ public class View extends javax.swing.JFrame {
      */
     public View() {
         initComponents();
-        grammarTextArea.setEditable(false);
-        resultTextArea.setEditable(false);
+        grammarTextArea.setVisible(false);
+        resultTextArea.setVisible(false);
     }
 
     /**
@@ -72,12 +72,14 @@ public class View extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -172,17 +174,24 @@ public class View extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("","txt","csv","text");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text File","txt","csv","text");
         impFileChooser.setFileFilter(filter);
         int option = impFileChooser.showOpenDialog(this);
         if (option == JFileChooser.APPROVE_OPTION) {
-            cfg.loadFromFile(impFileChooser.getSelectedFile());
+            File grammarFile = impFileChooser.getSelectedFile();
+            cfg.loadFromFile(grammarFile);
+            fileTextField.setText(grammarFile.getAbsolutePath());
+            grammarTextArea.setVisible(true);
+            resultTextArea.setVisible(true);
+            grammarTextArea.setEditable(false);
+            resultTextArea.setEditable(false);
+            grammarTextArea.setText(cfg.toString());
+            cfg.validate();
+            resultTextArea.setText(cfg.toString());
         }
-        System.out.println("HashMap: " + cfg.getNonTerminals());
         //System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    
     
     ContextFreeGrammar cfg = new ContextFreeGrammar();
 
