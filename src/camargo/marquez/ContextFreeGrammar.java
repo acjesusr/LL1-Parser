@@ -45,8 +45,8 @@ public class ContextFreeGrammar {
                 }
             }
             this.validate();
-            this.first();
             System.out.println("first: "+ firstMap);
+            System.out.println("follow: " + followMap);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ContextFreeGrammar.class.getName()).log(Level.SEVERE, "File not found", ex);
         }
@@ -66,6 +66,8 @@ public class ContextFreeGrammar {
                 nonTerminals.put(key + "'", temp);
             } 
         }
+        this.first();
+        this.follow();
     }
     
     private ArrayList<String> checkFactorization(String header,ArrayList<String> prods){
@@ -144,34 +146,6 @@ public class ContextFreeGrammar {
         return null;
     }
     
-    /*private LinkedHashMap<String,ArrayList<String>> first(){
-       LinkedHashMap<String,ArrayList<String>> firstHashMap = new LinkedHashMap<>();
-       for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
-        ArrayList<String> firstArray = new ArrayList<>();
-         firstArray = searchTerminal(nonTerminals.get(key),0);
-         firstHashMap.put(key,firstArray);
-       }
-       return firstHashMap;
-   }
-   
-   private ArrayList<String> searchTerminal(ArrayList<String> auxArray, int j){
-        int i = 0;
-        ArrayList<String> firstArray = new ArrayList<>();
-        j = 0;
-        if(j<auxArray.size()){
-            String temp = auxArray.get(j).length() > 1 && auxArray.get(j).charAt(i+1) == (char)39 ?
-                    auxArray.get(j).substring(0, i+2) : auxArray.get(j).charAt(i)+"";
-            //System.out.println("temp: " + temp);
-            if(!nonTerminals.containsKey(temp)){
-                firstArray.add(temp);
-                //searchTerminal(nonTerminals.get(auxArray.get(j).charAt(i)+""),j++);
-            }else{
-                System.out.println("switch to: " +temp);
-                firstArray.addAll(searchTerminal(nonTerminals.get(temp),j));
-            }
-        }
-       return firstArray;
-   }*/
     private void first(){
         Stack<String[]> update = new Stack<>();
         nonTerminals.forEach((header, prods) -> {
@@ -196,6 +170,61 @@ public class ContextFreeGrammar {
         while(!update.isEmpty()){
             String[] reference = update.pop();
             firstMap.get(reference[0]).addAll(firstMap.get(reference[1]));
+        }
+    }
+    
+    private void follow(){
+        Stack<String[]> update = new Stack<>();
+        nonTerminals.keySet().forEach((key) -> {
+            LinkedHashSet<String> follow = new LinkedHashSet<>();
+            nonTerminals.forEach((header, prods) -> {
+                if (!header.equals(key)) {
+                    prods.forEach((prod) -> {
+                        int index = prod.indexOf(key);
+                        if (index > -1) {
+                            index+=key.length();
+                            if (index == prod.length()) {
+                                if (followMap.containsKey(header)) {
+                                    follow.addAll(followMap.get(header));
+                                }else{
+                                    update.add(new String[]{key,header});
+                                }
+                            }else{
+                                String temp = prod.charAt(index) + "";
+                                if (!temp.equals("'")) {
+                                    if (temp.toLowerCase().equals(temp)){
+                                        follow.add(temp);
+                                    }else{
+                                        if (index+1 < prod.length() && prod.charAt(index+1) == (char)39){
+                                            temp+="'";
+                                        }
+                                        LinkedHashSet<String> first = firstMap.get(temp);
+                                        first.forEach((str) -> {
+                                            if (!str.equals("&")){
+                                                follow.add(str);
+                                            }else{
+                                                if (followMap.containsKey(header)) {
+                                                    follow.addAll(followMap.get(header));
+                                                }else{
+                                                    update.add(new String[]{key,header});
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            if (followMap.isEmpty()) {
+                follow.add("$");
+            }
+            followMap.put(key, follow);
+        });
+        while(!update.isEmpty()){
+            String[] reference = update.pop();
+            followMap.get(reference[0]).addAll(followMap.get(reference[1]));
         }
     }
     
