@@ -204,7 +204,7 @@ public class View extends javax.swing.JFrame {
 //                }
 //            }
             mTable.setModel(new DefaultTableModel(mTableMatrix,mTableColumns));
-
+            updateFirstFollowTable();
         }
         //System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -300,5 +300,16 @@ public class View extends javax.swing.JFrame {
         return matrix;
     }
     
-    
+    private void updateFirstFollowTable(){
+        String[] columns = {"Non-terminal","First","Follow"};
+        String[][] content = new String[cfg.getNonTerminals().keySet().size()][3];
+        int i = 0;
+        for (String nonTerminal : cfg.getNonTerminals().keySet()) {
+            content[i][0]=nonTerminal;
+            content[i][1]=cfg.getFirstMap().get(nonTerminal).toString();
+            content[i][2]=cfg.getFollowMap().get(nonTerminal).toString();
+            i++;
+        }
+        firstFollowTable.setModel(new DefaultTableModel(content,columns));
+    }
 }
