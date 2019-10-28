@@ -24,11 +24,13 @@ public class ContextFreeGrammar {
     private LinkedHashMap<String,ArrayList<String>> nonTerminals;
     private LinkedHashMap<String,LinkedHashSet<String>> firstMap;
     private LinkedHashMap<String,LinkedHashSet<String>> followMap;
+    public LinkedHashMap<String,LinkedHashMap<String,String>> mTableHash;
     
     public ContextFreeGrammar(){
         nonTerminals = new LinkedHashMap<>();
         firstMap = new LinkedHashMap<>();
         followMap = new LinkedHashMap<>();
+        mTableHash = new LinkedHashMap<>();
     }
     
     public void loadFromFile(File file){
@@ -226,17 +228,63 @@ public class ContextFreeGrammar {
         }
     }
     
-    private void getMTableColumns(){
-        nonTerminals.forEach((header,prod)->{
-            
-        
-        });
+    public ArrayList<String[]> verify(String str){
+        ArrayList<String[]> verifyArray = new ArrayList<>();
+        Stack<String> input = new Stack<String>(){
+            @Override
+            public String toString(){
+                return this.stream().reduce("", String::concat);
+            }
+        };
+        Stack<String> stack = new Stack<String>(){
+            @Override
+            public String toString(){
+                return this.stream().reduce("", String::concat);
+            }
+        };
+        stack.add("$");
+        stack.add(nonTerminals.keySet().stream().findFirst().get());
+        input.add("$");
+        for (int i = str.length()-1; i >= 0; i--) {
+            input.add(str.charAt(i)+"");
+        }
+        if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
+            verifyArray.add(new String[]{stack.toString(),input.toString(),stack.peek()+"->"+mTableHash.get(stack.peek()).get(input.peek())});
+            stack.pop();
+            for (char ch : mTableHash.get(stack.peek()).get(input.peek()).toCharArray()) {
+                if (ch != '&') {
+                    stack.add(ch +"");
+                }
+            }
+            while(!input.peek().equals("$") && !stack.peek().equals("$")){
+                if (stack.peek().equals(input.peek())) {
+                    stack.pop();
+                    input.pop();
+                    verifyArray.add(new String[]{stack.toString(),input.toString(),""});
+                }else{
+                    if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
+                        verifyArray.add(new String[]{stack.toString(),input.toString(),stack.peek()+"->"+mTableHash.get(stack.peek()).get(input.peek())});
+                        stack.pop();
+                        for (char ch : mTableHash.get(stack.peek()).get(input.peek()).toCharArray()) {
+                            if (ch != '&') {
+                                stack.add(ch +"");
+                            }
+                        }
+                    }else{
+                        verifyArray.add(new String[]{stack.toString(),input.toString(),"error"});
+                        break;
+                    }
+                }
+            }
+        }else{
+            verifyArray.add(new String[]{stack.toString(),input.toString(),"error"});
+        }
+        if (input.peek().equals("$") && stack.peek().equals(input.peek())) {
+            verifyArray.add(new String[]{stack.toString(),input.toString(),"aceptar"});
+        }
+        return verifyArray;
     }
-    
-    private void getMTableMatrix(){
         
-    }
-    
     @Override
     public String toString(){
         String res = "";
