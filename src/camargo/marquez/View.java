@@ -6,8 +6,12 @@
 package camargo.marquez;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -188,6 +192,19 @@ public class View extends javax.swing.JFrame {
             grammarTextArea.setText(cfg.toString());
             cfg.validate();
             resultTextArea.setText(cfg.toString());
+            String[] mTableColumns = getMTableColumns(cfg.getNonTerminals());
+            String[][] mTableMatrix = getMTableMatrix(cfg.getNonTerminals().size(), mTableColumns.length, mTableColumns);
+//            for (int i = 0; i < mTableColumns.length; i++) {
+//                System.out.println(mTableColumns[i]);
+//            }
+//           
+//            for (int i = 0; i < cfg.getNonTerminals().size(); i++) {
+//                for (int j = 0; j < mTableColumns.length; j++) {
+//                    System.out.println("content: " + mTableMatrix[i][j]);
+//                }
+//            }
+            mTable.setModel(new DefaultTableModel(mTableMatrix,mTableColumns));
+
         }
         //System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -214,4 +231,74 @@ public class View extends javax.swing.JFrame {
     private javax.swing.JTable mTable;
     private javax.swing.JTextArea resultTextArea;
     // End of variables declaration//GEN-END:variables
+    
+    
+    private String[] getMTableColumns(LinkedHashMap<String,ArrayList<String>> hashMap){
+       int cant = 0;
+       LinkedHashSet<String> terms = new LinkedHashSet<>();
+       terms.add("NoTerm|Term");
+       hashMap.forEach((header,prods)->{
+          for(String prod : prods){
+              for (int i = 0; i < prod.length(); i++) {
+                  String symbol = prod.charAt(i)+"";
+                  if(symbol.toLowerCase().equals(symbol) && !symbol.equals("'") && !symbol.equals("&")){//terminal
+                      terms.add(symbol);
+                  }
+              }
+          }
+       });
+       terms.add("$");
+       String[] columns = new String[terms.size()];
+       for(String term : terms){
+           columns[cant] = term;
+           cant++;
+       }
+       return columns;
+    }
+    
+    private String[][] getMTableMatrix(int rows, int columns, String[] terminals){
+        ArrayList<String> terminalArrayList = new ArrayList<>();
+        ArrayList<String> noTerminalArrayList = new ArrayList<>();
+        LinkedHashMap<String,ArrayList<String>> prodMap = cfg.getNonTerminals();
+        LinkedHashMap<String,LinkedHashSet<String>> firstMap = cfg.getFirstMap();
+        LinkedHashMap<String,LinkedHashSet<String>> followMap = cfg.getFollowMap();
+        String[][] matrix = new String[rows][columns];
+        for (int i = 0; i < terminals.length; i++) {
+            terminalArrayList.add(terminals[i]);
+        }
+        prodMap.forEach((headerProd,prod)->{
+            noTerminalArrayList.add(headerProd);
+        });
+        for (int j = 0; j < noTerminalArrayList.size(); j++) {
+            matrix[j][0] = noTerminalArrayList.get(j);
+        }
+        firstMap.forEach((headerFirst,symbolsFirst)->{
+            symbolsFirst.forEach((sym)->{
+                if(!sym.equals("&")){
+                    prodMap.forEach((headerProd,prods)->{
+                        prods.forEach((prod)->{
+                           if(prod.contains(sym) ||
+                                   (firstMap.containsKey(prod.charAt(0)+"") &&
+                                   firstMap.get(prod.charAt(0)+"").contains(sym))){
+                                System.out.println("sym: " + sym);
+                                System.out.println("matrix length: (" + matrix.length + ", " +matrix[0].length + ")");
+                                System.out.println("i, j: (" + noTerminalArrayList.indexOf(headerProd) + ", " + terminalArrayList.indexOf(sym) + ")");
+                                matrix[noTerminalArrayList.indexOf(headerProd)][terminalArrayList.indexOf(sym)] = 
+                                   headerProd+"->"+prod;
+                            } 
+                        });
+                    });
+                }else{
+                    LinkedHashSet<String> follow = followMap.get(headerFirst);
+                    follow.forEach((term)->{
+                        matrix[noTerminalArrayList.indexOf(headerFirst)][terminalArrayList.indexOf(term)] = 
+                                headerFirst+"->"+"&";
+                    });
+                }
+            });
+        });
+        return matrix;
+    }
+    
+    
 }

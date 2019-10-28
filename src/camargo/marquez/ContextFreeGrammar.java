@@ -226,6 +226,17 @@ public class ContextFreeGrammar {
         }
     }
     
+    private void getMTableColumns(){
+        nonTerminals.forEach((header,prod)->{
+            
+        
+        });
+    }
+    
+    private void getMTableMatrix(){
+        
+    }
+    
     @Override
     public String toString(){
         String res = "";
