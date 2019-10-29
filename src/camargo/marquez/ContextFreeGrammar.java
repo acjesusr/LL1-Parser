@@ -35,6 +35,10 @@ public class ContextFreeGrammar {
     
     public void loadFromFile(File file){
         try {
+            nonTerminals = new LinkedHashMap<>();
+            firstMap = new LinkedHashMap<>();
+            followMap = new LinkedHashMap<>();
+            mTableHash = new LinkedHashMap<>();
             Scanner fScan = new Scanner(file);
             while(fScan.hasNext()){
                 String temp = fScan.nextLine();
