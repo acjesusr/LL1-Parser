@@ -229,60 +229,83 @@ public class ContextFreeGrammar {
     }
     
     public ArrayList<String[]> verify(String str){
-        ArrayList<String[]> verifyArray = new ArrayList<>();
-        Stack<String> input = new Stack<String>(){
-            @Override
-            public String toString(){
-                return this.stream().reduce("", String::concat);
-            }
-        };
+        ArrayList<String[]> verification = new ArrayList<>();
         Stack<String> stack = new Stack<String>(){
             @Override
             public String toString(){
                 return this.stream().reduce("", String::concat);
             }
         };
-        stack.add("$");
-        stack.add(nonTerminals.keySet().stream().findFirst().get());
-        input.add("$");
-        for (int i = str.length()-1; i >= 0; i--) {
-            input.add(str.charAt(i)+"");
-        }
-        if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
-            verifyArray.add(new String[]{stack.toString(),input.toString(),stack.peek()+"->"+mTableHash.get(stack.peek()).get(input.peek())});
-            stack.pop();
-            for (char ch : mTableHash.get(stack.peek()).get(input.peek()).toCharArray()) {
-                if (ch != '&') {
-                    stack.add(ch +"");
+        Stack<String> input = new Stack<String>(){
+            @Override
+            public String toString(){
+                String res = this.stream().reduce("", String::concat);
+                char[] chRes = res.toCharArray();
+                res = "";
+                for (int i = 0; i < chRes.length; i++) {
+                    res = chRes[i] + res;
                 }
+                return res;
             }
-            while(!input.peek().equals("$") && !stack.peek().equals("$")){
-                if (stack.peek().equals(input.peek())) {
-                    stack.pop();
-                    input.pop();
-                    verifyArray.add(new String[]{stack.toString(),input.toString(),""});
+        };
+        input.add("$");
+        stack.add("$");
+        for (int i = str.length()-1; i >= 0; i--) {
+            input.add(str.charAt(i) + "");
+        }
+        stack.add(nonTerminals.keySet().stream().findFirst().get());
+        if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
+            String value = mTableHash.get(stack.peek()).get(input.peek());
+            String strStack = stack.toString();
+            String msg = stack.pop() + "->" + value;
+            verification.add(new String[]{strStack,input.toString(),msg});
+            updateStack(stack,value);
+            while(!stack.peek().equals("$")){
+                if (stack.peek().toLowerCase().equals(stack.peek())) {
+                    if (stack.peek().equals(input.peek())) {
+                        strStack = stack.toString();
+                        stack.pop();
+                        input.pop();
+                        msg = "";
+                    }else{
+                        verification.add(new String[]{stack.toString(),input.toString(),"Error"});
+                        break;
+                    }
                 }else{
                     if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
-                        verifyArray.add(new String[]{stack.toString(),input.toString(),stack.peek()+"->"+mTableHash.get(stack.peek()).get(input.peek())});
-                        stack.pop();
-                        for (char ch : mTableHash.get(stack.peek()).get(input.peek()).toCharArray()) {
-                            if (ch != '&') {
-                                stack.add(ch +"");
-                            }
-                        }
+                        value = mTableHash.get(stack.peek()).get(input.peek());
+                        strStack = stack.toString();
+                        msg = stack.pop() + "->" + value;
+                        updateStack(stack,value);
                     }else{
-                        verifyArray.add(new String[]{stack.toString(),input.toString(),"error"});
+                        verification.add(new String[]{stack.toString(),input.toString(),"Error"});
                         break;
                     }
                 }
+                verification.add(new String[]{strStack,input.toString(),msg});
             }
         }else{
-            verifyArray.add(new String[]{stack.toString(),input.toString(),"error"});
+            verification.add(new String[]{stack.toString(),input.toString(),"Error"});
         }
-        if (input.peek().equals("$") && stack.peek().equals(input.peek())) {
-            verifyArray.add(new String[]{stack.toString(),input.toString(),"aceptar"});
+        if (stack.peek().equals(input.peek())) {
+            System.out.println("final stack: " + stack.peek());
+            verification.add(new String[]{stack.toString(),input.toString(),"Acept"});
         }
-        return verifyArray;
+        return  verification;
+    }
+    private void updateStack(Stack<String> stack, String value){
+        char[] elements = value.toCharArray();
+        String prime = "";
+        for (int i = elements.length-1; i >= 0; i--) {
+            if (elements[i] != '&') {
+                if (elements[i] != (char)39) {
+                    stack.add(elements[i] + prime);
+                    prime = "";
+                }else{
+                    prime = "'";
+                }
+            }
+        }
     }
         
     @Override

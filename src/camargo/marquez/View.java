@@ -58,7 +58,7 @@ public class View extends javax.swing.JFrame {
         fileTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        StringTextField = new javax.swing.JTextField();
+        strTextField = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -145,7 +145,7 @@ public class View extends javax.swing.JFrame {
         ));
         jScrollPane5.setViewportView(parserTable);
 
-        jTabbedPane1.addTab("Verifier", jScrollPane5);
+        jTabbedPane1.addTab("Verification Table", jScrollPane5);
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel1.setText("Syntax Analysis.");
@@ -159,7 +159,7 @@ public class View extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setText("Ingresa cadena a validar:");
+        jLabel5.setText("Text to verify:");
 
         jButton2.setText("Verify");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -183,7 +183,7 @@ public class View extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(StringTextField))
+                                .addComponent(strTextField))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addGap(18, 18, 18)
@@ -207,7 +207,7 @@ public class View extends javax.swing.JFrame {
                 .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(StringTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(strTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 447, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -246,20 +246,23 @@ public class View extends javax.swing.JFrame {
 //            }
             mTable.setModel(new DefaultTableModel(mTableMatrix,mTableColumns));
             updateFirstFollowTable();
-            cfg.verify("testingValue");
         }
         //System.out.println(cfg.getS());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        String str = strTextField.getText();
+        if (str != null && !str.isEmpty()) {
+            verificationTable(str);
+        }else{
+            verificationTable("");
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    
     ContextFreeGrammar cfg = new ContextFreeGrammar();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField StringTextField;
     private javax.swing.JTextField fileTextField;
     private javax.swing.JTable firstFollowTable;
     private javax.swing.JTextArea grammarTextArea;
@@ -281,6 +284,7 @@ public class View extends javax.swing.JFrame {
     private javax.swing.JTable mTable;
     private javax.swing.JTable parserTable;
     private javax.swing.JTextArea resultTextArea;
+    private javax.swing.JTextField strTextField;
     // End of variables declaration//GEN-END:variables
     
     
@@ -379,17 +383,12 @@ public class View extends javax.swing.JFrame {
     }
     
     private void verificationTable(String s){
-        String [] columns = {"Stack","Entry","Production"};
-        Stack<String> stack = new Stack<>();
-        Stack<String> entryStack = new Stack<>();
-        stack.add("$");
-        char[] stringArray = s.toCharArray();
-        for (int i = 0; i < stringArray.length; i++) {
-            entryStack.add(stringArray[i]+"");
+        String [] columns = {"Stack","Input","Output"};
+        ArrayList<String[]> res = cfg.verify(s);
+        String[][] content = new String[res.size()][3];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = res.get(i);
         }
-        entryStack.add("$");
-        while(stack.pop() == "$"){
-            
-        }
+        parserTable.setModel(new DefaultTableModel(content,columns));
     }
 }

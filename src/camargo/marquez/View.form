@@ -38,7 +38,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="StringTextField" max="32767" attributes="0"/>
+                              <Component id="strTextField" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -71,7 +71,7 @@
               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="StringTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="strTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -241,8 +241,8 @@
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Verifier">
-                <Property name="tabTitle" type="java.lang.String" value="Verifier"/>
+              <JTabbedPaneConstraints tabName="Verification Table">
+                <Property name="tabTitle" type="java.lang.String" value="Verification Table"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -291,10 +291,10 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Ingresa cadena a validar:"/>
+        <Property name="text" type="java.lang.String" value="Text to verify:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="StringTextField">
+    <Component class="javax.swing.JTextField" name="strTextField">
     </Component>
     <Component class="javax.swing.JButton" name="jButton2">
       <Properties>
