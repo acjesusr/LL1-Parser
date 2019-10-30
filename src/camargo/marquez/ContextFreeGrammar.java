@@ -142,7 +142,7 @@ public class ContextFreeGrammar {
         if (!alpha.isEmpty()) {
             prods.removeAll(removing);
             prods.forEach((prod)->prod.concat(header+"'"));
-            prods.replaceAll((String t) -> t+header+"'");
+            prods.replaceAll((String t) -> t.equals("&")? header+"'" : t+header+"'");
             alpha.add("&");
             return alpha;
         }
@@ -153,27 +153,56 @@ public class ContextFreeGrammar {
     private void first(){
         Stack<String[]> update = new Stack<>();
         nonTerminals.forEach((header, prods) -> {
-            LinkedHashSet<String> first = new LinkedHashSet<>();
+            //LinkedHashSet<String> first = new LinkedHashSet<>();
             prods.forEach((prod) -> {
-                String start = prod.charAt(0)+"";
-                if (start.toLowerCase().equals(start)) {
-                    first.add(start);
-                }else{
-                    if (prod.length() > 1 && prod.charAt(1) == (char)39) {
-                        start+="'";
-                    }
-                    if (firstMap.containsKey(start)) {
-                        first.addAll(firstMap.get(start));
-                    }else{
-                        update.add(new String[]{header,start});//header contains start
-                    }
-                }
+                rFirst(header,prod,update);
             });
-            firstMap.put(header, first);
+            //firstMap.put(header, first);
         });
         while(!update.isEmpty()){
             String[] reference = update.pop();
-            firstMap.get(reference[0]).addAll(firstMap.get(reference[1]));
+            rFirst(reference[0],reference[1],null);
+        }
+    }
+    private void rFirst(String header, String prod, Stack<String[]> stack){
+        if ( (prod.charAt(0) +"").toLowerCase().equals(prod.charAt(0) +"")) {
+            if (!firstMap.containsKey(header)){
+                firstMap.put(header, new LinkedHashSet<>());
+            }
+            System.out.println(prod.charAt(0) +" first<--" + header);
+            firstMap.get(header).add(prod.charAt(0) +"");
+        }else{
+            String key = prod.charAt(0)+"";
+            if (prod.length() > 1 && (prod.charAt(1) == (char)39)) {
+                key+="'";
+            }
+            if (firstMap.containsKey(key)) {
+                if (firstMap.get(key).contains("&")) {
+                    if (!firstMap.containsKey(header)) {
+                        firstMap.put(header,new LinkedHashSet<String>());
+                    }
+                    firstMap.get(key).forEach((e)->{
+                        if (!e.equals("&")) {
+                            firstMap.get(header).add(e);
+                        }
+                    });
+                    if (prod.length() - key.length() > 0) {
+                        rFirst(header,prod.substring(key.length() > 1 ? 2:1),stack);
+                    }else{
+                        firstMap.get(header).add("&");
+                    }
+                }else{
+                    if (!firstMap.containsKey(header)) {
+                        firstMap.put(header,new LinkedHashSet<String>());
+                    }
+                    firstMap.get(header).addAll(firstMap.get(key));
+                }
+            }else{
+                /*LinkedHashSet<String> set = new LinkedHashSet<>();
+                set.add(prod.charAt(0) +"");
+                firstMap.put(header, set);*/
+                stack.add(new String[]{header,prod});
+            }
         }
     }
     
@@ -182,7 +211,7 @@ public class ContextFreeGrammar {
         nonTerminals.keySet().forEach((key) -> {
             LinkedHashSet<String> follow = new LinkedHashSet<>();
             nonTerminals.forEach((header, prods) -> {
-                if (!header.equals(key)) {
+                //if (!header.equals(key)) {
                     prods.forEach((prod) -> {
                         int index = prod.indexOf(key);
                         if (index > -1) {
@@ -219,7 +248,7 @@ public class ContextFreeGrammar {
                             }
                         }
                     });
-                }
+                //}
             });
             if (followMap.isEmpty()) {
                 follow.add("$");
