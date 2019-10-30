@@ -332,22 +332,22 @@ public class View extends javax.swing.JFrame {
                 if(!sym.equals("&")){
                     prodMap.forEach((headerProd,prods)->{
                         prods.forEach((prod)->{
-                           if(prod.contains(sym) ||
+                                if(prod.contains(sym) ||
                                    (firstMap.containsKey(prod.charAt(0)+"") &&
                                    firstMap.get(prod.charAt(0)+"").contains(sym))){
-                                System.out.println("sym: " + sym);
-                                System.out.println("matrix length: (" + matrix.length + ", " +matrix[0].length + ")");
-                                System.out.println("i, j: (" + noTerminalArrayList.indexOf(headerProd) + ", " + terminalArrayList.indexOf(sym) + ")");
-                                matrix[noTerminalArrayList.indexOf(headerProd)][terminalArrayList.indexOf(sym)] = 
-                                   headerProd+"->"+prod;
-                                if (!cfg.mTableHash.isEmpty() && cfg.mTableHash.containsKey(headerProd)) {
-                                   cfg.mTableHash.get(headerProd).put(sym, prod);
-                                }else{
-                                    LinkedHashMap<String,String> temp = new LinkedHashMap<>();
-                                    temp.put(sym, prod);
-                                    cfg.mTableHash.put(headerProd, temp);
+                                    System.out.println("sym: " + sym);
+                                    //System.out.println("matrix length: (" + matrix.length + ", " +matrix[0].length + ")");
+                                    System.out.println("i, j: (" + noTerminalArrayList.indexOf(headerProd) + ", " + terminalArrayList.indexOf(sym) + ")");
+                                    matrix[noTerminalArrayList.indexOf(headerProd)][terminalArrayList.indexOf(sym)] = 
+                                       headerProd+"->"+prod;
+                                    if (!cfg.mTableHash.isEmpty() && cfg.mTableHash.containsKey(headerProd)) {
+                                       cfg.mTableHash.get(headerProd).put(sym, prod);
+                                    }else{
+                                        LinkedHashMap<String,String> temp = new LinkedHashMap<>();
+                                        temp.put(sym, prod);
+                                        cfg.mTableHash.put(headerProd, temp);
+                                    }
                                 }
-                            } 
                         });
                     });
                 }else{

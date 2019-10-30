@@ -59,12 +59,12 @@ public class ContextFreeGrammar {
     public void validate(){
         for (String key : nonTerminals.keySet().toArray(new String[nonTerminals.size()])) {
            ArrayList<String> prods  = nonTerminals.get(key);
-           System.out.println("Before: " + prods);
+           //System.out.println("Before: " + prods);
            ArrayList<String> temp = checkRecursion(key, prods);
-           System.out.println("After recursion: " + prods + "->" + temp);
+           //System.out.println("After recursion: " + prods + "->" + temp);
            if (temp == null) {
                temp = checkFactorization(key, prods);
-               System.out.println("After factorization: " + prods + "->" + temp);
+               //System.out.println("After factorization: " + prods + "->" + temp);
            }
             if (temp != null) {
                 nonTerminals.put(key + "'", temp);
@@ -104,7 +104,7 @@ public class ContextFreeGrammar {
                     if (prod.startsWith(factor)) {
                         String beta = prod.substring(factor.length(), prod.length());
                         tProds.add(beta.isEmpty() ? "&" : beta);
-                        System.out.println("Factoring: " + (beta.isEmpty() ? "&" : beta));
+                        //System.out.println("Factoring: " + (beta.isEmpty() ? "&" : beta));
                         prods.remove(i);
                     }else{
                         i++;
@@ -169,7 +169,7 @@ public class ContextFreeGrammar {
             if (!firstMap.containsKey(header)){
                 firstMap.put(header, new LinkedHashSet<>());
             }
-            System.out.println(prod.charAt(0) +" first<--" + header);
+            //System.out.println(prod.charAt(0) +" first<--" + header);
             firstMap.get(header).add(prod.charAt(0) +"");
         }else{
             String key = prod.charAt(0)+"";
@@ -232,17 +232,17 @@ public class ContextFreeGrammar {
                                             temp+="'";
                                         }
                                         LinkedHashSet<String> first = firstMap.get(temp);
-                                        first.forEach((str) -> {
+                                        for (String str : first) {
                                             if (!str.equals("&")){
                                                 follow.add(str);
                                             }else{
-                                                if (followMap.containsKey(header)) {
-                                                    follow.addAll(followMap.get(header));
+                                                if (followMap.containsKey(temp)) {
+                                                    follow.addAll(followMap.get(temp));
                                                 }else{
-                                                    update.add(new String[]{key,header});
+                                                    update.add(new String[]{key,temp});
                                                 }
                                             }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -253,11 +253,18 @@ public class ContextFreeGrammar {
             if (followMap.isEmpty()) {
                 follow.add("$");
             }
+            System.out.println("follow: " + key + ", " + follow);
             followMap.put(key, follow);
         });
         while(!update.isEmpty()){
             String[] reference = update.pop();
             followMap.get(reference[0]).addAll(followMap.get(reference[1]));
+            System.out.println("update follow: " + reference[0] + ", " + followMap.get(reference[0]));
+        }
+        for (String key : followMap.keySet()) {
+            if (key.contains("'")) {
+                followMap.get(key).addAll(followMap.get(key.substring(0, key.length()-1)));
+            }
         }
     }
     
@@ -291,13 +298,15 @@ public class ContextFreeGrammar {
             String value = mTableHash.get(stack.peek()).get(input.peek());
             String strStack = stack.toString();
             String msg = stack.pop() + "->" + value;
-            verification.add(new String[]{strStack,input.toString(),msg});
+            String strInput = input.toString();
+            verification.add(new String[]{strStack,strInput,msg});
             updateStack(stack,value);
             while(!stack.peek().equals("$")){
                 if (stack.peek().toLowerCase().equals(stack.peek())) {
                     if (stack.peek().equals(input.peek())) {
                         strStack = stack.toString();
                         stack.pop();
+                        strInput = input.toString();
                         input.pop();
                         msg = "";
                     }else{
@@ -308,6 +317,7 @@ public class ContextFreeGrammar {
                     if (mTableHash.get(stack.peek()).containsKey(input.peek())) {
                         value = mTableHash.get(stack.peek()).get(input.peek());
                         strStack = stack.toString();
+                        strInput = input.toString();
                         msg = stack.pop() + "->" + value;
                         updateStack(stack,value);
                     }else{
@@ -315,7 +325,7 @@ public class ContextFreeGrammar {
                         break;
                     }
                 }
-                verification.add(new String[]{strStack,input.toString(),msg});
+                verification.add(new String[]{strStack,strInput,msg});
             }
         }else{
             verification.add(new String[]{stack.toString(),input.toString(),"Error"});
